@@ -10,16 +10,19 @@ import { useForm } from "@mantine/form";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { supabase } from "@/lib/supabase";
 
 const Home: NextPage = () => {
+  const { user } = supabase.from("users").select("id, email, user_name") as any;
+  console.log(user);
   const [opened, setOpened] = useState(false);
-  const [socket, _] = useState(() => io())
-  const [rooms, setRooms] = useState([]) as any
+  const [socket, _] = useState(() => io());
+  const [rooms, setRooms] = useState([]) as any;
   const form = useForm({
     initialValues: {
       roomName: "",
       count: 1,
-      isRelease: false
+      isRelease: false,
     },
 
     validate: {
@@ -41,13 +44,16 @@ const Home: NextPage = () => {
   useEffect(() => {
     socket.emit("room list", _, (replace: any) => {
       console.log(replace);
-    })
-  }, [])
+    });
+  }, []);
 
-  const onSubmit = (values: { roomName: string; count: number, isRelease: boolean }) => {
+  const onSubmit = (values: {
+    roomName: string;
+    count: number;
+    isRelease: boolean;
+  }) => {
     socket.emit("create room", values, (response: string) => {
-      console.log(response);
-      setRooms([...rooms, response])
+      setRooms([...rooms, response]);
     });
     setOpened(false);
   };
@@ -55,7 +61,6 @@ const Home: NextPage = () => {
   return (
     <>
       <h2>ルーム一覧</h2>
-      <h3>{rooms}</h3>
       <Modal
         opened={opened}
         onClose={() => setOpened(false)}
@@ -81,7 +86,11 @@ const Home: NextPage = () => {
             withAsterisk
             {...form.getInputProps("count")}
           />
-          <Checkbox label="公開する" mt="md" {...form.getInputProps('isRelease', { type: 'checkbox' })} />
+          <Checkbox
+            label="公開する"
+            mt="md"
+            {...form.getInputProps("isRelease", { type: "checkbox" })}
+          />
           <Button type="submit" color="violet" mt="md" sx={{ float: "right" }}>
             作成
           </Button>

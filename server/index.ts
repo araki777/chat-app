@@ -3,7 +3,6 @@ import next from "next";
 import { Server, createServer } from "http";
 import { Server as socketioServer, Socket } from "socket.io";
 import idGenerator from "../helpers/id-generator";
-import { MissingStaticPage } from "next/dist/shared/lib/utils";
 
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
@@ -28,26 +27,26 @@ nextApp.prepare().then(async () => {
   io.on("connection", (socket: Socket) => {
     console.log("クライアントと接続しました");
     socket.on("create room", (values, callback) => {
-      const { roomName, count, isRelease } = values
-      const roomId = "room-" + idGenerator().toString()
+      const { roomName, count, isRelease } = values;
+      const roomId = "room-" + idGenerator().toString();
       socket.join(roomId);
       console.log(io.sockets.adapter.rooms);
-      callback(roomId)
+      callback(roomId);
     });
 
     socket.on("disconnect", () => {
       console.log("クライアントと切断しました");
-    })
+    });
 
     socket.on("room list", (_, callback) => {
-      const rooms = io.sockets.adapter.rooms
-      const roomList = [] as any
+      const rooms = io.sockets.adapter.rooms;
+      const roomList = [] as any;
       rooms.forEach((_, key) => {
         if (key.match(/room-*/)) {
-          roomList.push(key)
+          roomList.push(key);
         }
-      })
-      callback(roomList)
-    })
+      });
+      callback(roomList);
+    });
   });
 });
