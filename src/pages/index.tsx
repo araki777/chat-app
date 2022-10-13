@@ -1,22 +1,25 @@
 import {
   Button,
+  Checkbox,
   Group,
   Modal,
   NumberInput,
-  Textarea,
   TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 const Home: NextPage = () => {
   const [opened, setOpened] = useState(false);
+  const [socket, _] = useState(() => io())
+  const [rooms, setRooms] = useState([]) as any
   const form = useForm({
     initialValues: {
       roomName: "",
       count: 1,
+      isRelease: false
     },
 
     validate: {
@@ -35,12 +38,24 @@ const Home: NextPage = () => {
     },
   });
 
-  const onSubmit = (values: { roomName: string; count: Number }) => {
+  useEffect(() => {
+    socket.emit("room list", _, (replace: any) => {
+      console.log(replace);
+    })
+  }, [])
+
+  const onSubmit = (values: { roomName: string; count: number, isRelease: boolean }) => {
+    socket.emit("create room", values, (response: string) => {
+      console.log(response);
+      setRooms([...rooms, response])
+    });
     setOpened(false);
   };
 
   return (
     <>
+      <h2>ルーム一覧</h2>
+      <h3>{rooms}</h3>
       <Modal
         opened={opened}
         onClose={() => setOpened(false)}
@@ -63,8 +78,10 @@ const Home: NextPage = () => {
             min={1}
             defaultValue={1}
             mt="md"
+            withAsterisk
             {...form.getInputProps("count")}
           />
+          <Checkbox label="公開する" mt="md" {...form.getInputProps('isRelease', { type: 'checkbox' })} />
           <Button type="submit" color="violet" mt="md" sx={{ float: "right" }}>
             作成
           </Button>
