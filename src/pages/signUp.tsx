@@ -1,35 +1,30 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import useAuth from '@/hooks/useAuth'
-import { TextInput, Select, Button, Group, Box } from '@mantine/core';
+import { useUser } from '@/context/user';
+import { TextInput, Button, Group, Box } from '@mantine/core';
 import { useForm } from '@mantine/form'
 
 interface SignUpFormInput {
   name: string;
   email: string;
   password: string;
-  employeePosition: number;
 }
 
 const SignUp: NextPage = () => {
   const router = useRouter()
-  const { onSignUp } = useAuth();
+  const { onSignUp } = useUser();
   const form = useForm<SignUpFormInput>({
     initialValues: {
       name: "",
       email: "",
-      password: "",
-      employeePosition: 0
+      password: ""
     },
   });
 
   const formOnSubmit = async (data: SignUpFormInput) => {
     console.log(data);
-    const { name, email, password, employeePosition } = data;
-    if (employeePosition === 0) {
-      return;
-    }
-    await onSignUp(email, password, name, employeePosition)
+    const { name, email, password } = data;
+    await onSignUp(email, password, name)
   }
 
   return (
@@ -53,12 +48,6 @@ const SignUp: NextPage = () => {
           placeholder="パスワードを入力してください"
           {...form.getInputProps('password')}
         />
-        <Select withAsterisk label="職位" placeholder="職位を選んでください"
-          data={[
-            {value: "1", label: '正社員'},
-            {value: "2", label: '業務委託'},
-            {value: "3", label: 'バイト'}
-          ]} {...form.getInputProps('employeePosition')} />
         <Group position="right" mt="md">
           <Button type="submit">送信</Button>
           <Button onClick={() => router.push('/login')}>ログイン画面へ</Button>

@@ -514,6 +514,25 @@
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.1.0.tgz#96116f2a912e0c02817345b3c10751069920d553"
   integrity sha512-+9jVqKhRSpsc591z5vX+X5Yyw+he/HCB4iQ/RYxw35CEPaY1gnsNE43nf9n9AaYjAQrTiI/mOwKUKdUs9vf7Xg==
 
+"@supabase/auth-helpers-nextjs@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@supabase/auth-helpers-nextjs/-/auth-helpers-nextjs-0.4.0.tgz#b9b8528c7d6a6b3f7374428fc40fcafb41fd41f0"
+  integrity sha512-qECcdWfz/gK0vh7ZQ/JOZfEC2heCKZsR0mrogxAuWtwkNJy4sMdoSfxwp41g9ee56ubw+jJcCGAXfuoe5YRoBA==
+  dependencies:
+    "@supabase/auth-helpers-shared" "0.2.0"
+
+"@supabase/auth-helpers-react@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@supabase/auth-helpers-react/-/auth-helpers-react-0.3.0.tgz#a0221c2bad6d8ec82dd42804e5b7e8c8abdff1a7"
+  integrity sha512-yCJPUdtElPxmlk6FXZJdMWLnCuYU1qD7pzHxVjF+vO+NwddZ00qKTi53UJu83+H3QeDgZZrNR1ueCi/sLY+kYw==
+  dependencies:
+    "@supabase/auth-helpers-shared" "0.2.0"
+
+"@supabase/auth-helpers-shared@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@supabase/auth-helpers-shared/-/auth-helpers-shared-0.2.0.tgz#9d740ddbb2a3bb7c4d8a4a30842646aa0afc64aa"
+  integrity sha512-GaWzuP3RjLSdSlFajbgwQkZO24A14DSEIJG5sUva/sUYWkriEWROjf8Vbwg4YsSxqeU6fP3lloFeync9BwgyYA==
+
 "@supabase/functions-js@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@supabase/functions-js/-/functions-js-2.0.0.tgz#4ba0c9e6dff031e17666bef6779c48eff290a8a0"

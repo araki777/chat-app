@@ -1,3 +1,5 @@
+import { useUser } from "@/context/user";
+import UserGuard from "@/guards/userGuard";
 import {
   Button,
   Checkbox,
@@ -10,14 +12,13 @@ import { useForm } from "@mantine/form";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
-import { supabase } from "@/lib/supabase";
 
 const Home: NextPage = () => {
-  const { user } = supabase.from("users").select("id, email, user_name") as any;
-  console.log(user);
   const [opened, setOpened] = useState(false);
   const [socket, _] = useState(() => io());
   const [rooms, setRooms] = useState([]) as any;
+  const { onSignOut } = useUser();
+
   const form = useForm({
     initialValues: {
       roomName: "",
@@ -59,7 +60,8 @@ const Home: NextPage = () => {
   };
 
   return (
-    <>
+    <UserGuard>
+      <button onClick={() => onSignOut()}>サインアウト</button>
       <h2>ルーム一覧</h2>
       <Modal
         opened={opened}
@@ -99,9 +101,8 @@ const Home: NextPage = () => {
       <Group position="center">
         <Button onClick={() => setOpened(true)}>ルーム新規作成</Button>
       </Group>
-    </>
+    </UserGuard>
   );
-  return <></>;
 };
 
 export default Home;

@@ -10,8 +10,8 @@ import {
   Grid,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import useAuth from "@/hooks/useAuth";
 import Link from "next/link";
+import { useUser } from "@/context/user";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -54,7 +54,7 @@ interface SignInFormInput {
 
 const SignIn: NextPage = () => {
   const { classes } = useStyles();
-  const { onSignIn, onSignInWithGoogle, onSignInWithGitHub } = useAuth();
+  const { onSignIn, onSignInWithGoogle, onSignInWithGitHub } = useUser();
   const form = useForm<SignInFormInput>({
     initialValues: {
       email: "",
