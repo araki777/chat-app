@@ -16,8 +16,13 @@ model messages {
 }
 
 model rooms {
-  id         BigInt    @id @default(autoincrement())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
+  room_name  String?
+  capacity   BigInt?
+  isRelease  Boolean?
+  user_id    String?   @db.Uuid
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
@@ -31,7 +36,11 @@ model unread_manage {
 }
 
 model users {
-  id        String  @id @db.Uuid
-  email     String
-  user_name String?
+  id         String    @id @db.Uuid
+  email      String
+  user_name  String?
+  avatar_url String?
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  rooms      rooms[]
 }

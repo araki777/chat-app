@@ -2,12 +2,13 @@ import express, { Request, Response, Express } from "express";
 import next from "next";
 import { Server, createServer } from "http";
 import { Server as socketioServer, Socket } from "socket.io";
-import idGenerator from "../helpers/id-generator";
+import { PrismaClient } from "@prisma/client";
 
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
 const port = process.env.PORT || 3000;
+const prisma = new PrismaClient();
 
 nextApp.prepare().then(async () => {
   const expressApp: Express = express();
@@ -26,27 +27,33 @@ nextApp.prepare().then(async () => {
 
   io.on("connection", (socket: Socket) => {
     console.log("クライアントと接続しました");
-    socket.on("create room", (values, callback) => {
-      const { roomName, count, isRelease } = values;
-      const roomId = "room-" + idGenerator().toString();
-      socket.join(roomId);
-      console.log(io.sockets.adapter.rooms);
-      callback(roomId);
+    socket.on("create room", async (data, callback) => {
+      try {
+        const { roomName, capacity, isRelease, userId } = data;
+        const room = await prisma.rooms.create({
+          data: {
+            room_name: roomName,
+            capacity,
+            isRelease,
+            user_id: userId
+          } as any
+        })
+        const roomId = 'room-' + room.id
+        socket.join(roomId);
+        callback({ roomName: roomName, message: '部屋を作成しました' })
+      } catch(e) {
+        callback(e)
+      }
     });
 
     socket.on("disconnect", () => {
       console.log("クライアントと切断しました");
     });
 
-    socket.on("room list", (_, callback) => {
-      const rooms = io.sockets.adapter.rooms;
-      const roomList = [] as any;
-      rooms.forEach((_, key) => {
-        if (key.match(/room-*/)) {
-          roomList.push(key);
-        }
-      });
-      callback(roomList);
+    socket.on("room list", async (_, callback) => {
+      const rooms = await prisma.rooms.findMany();
+      console.log(io.sockets.adapter.rooms)
+      callback(rooms)
     });
   });
 });

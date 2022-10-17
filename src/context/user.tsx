@@ -1,7 +1,8 @@
-import { createContext, useState, useContext, Dispatch, SetStateAction, useEffect } from 'react'
+import { createContext, useState, useContext, useEffect, Dispatch, SetStateAction } from 'react'
 import { supabase } from '@/lib/supabase'
-import { UserResponse } from '@supabase/supabase-js';
 import { useRouter } from 'next/router'
+import { Session, User } from '@supabase/supabase-js';
+
 
 type authContextType = {
   onSignUp: (email: string, password: string, name: string) => Promise<void>;
@@ -9,27 +10,39 @@ type authContextType = {
   onSignInWithGoogle: () => void;
   onSignInWithGitHub: () => void;
   onSignOut: () => void;
-  user: Promise<UserResponse> | undefined,
-  setUser: Dispatch<SetStateAction<Promise<UserResponse> | undefined>>,
+  user: User | undefined,
   loading: boolean
 }
 
 const Context = createContext({} as authContextType)
 
 const Provider = ({ children }: any) => {
-  const [user, setUser] = useState<Promise<UserResponse>>();
+  const [session, setSession] = useState<Session | null>()
+  const [user, setUser] = useState<User | undefined>();
   const [loading, setLoading] = useState(false);
   const router = useRouter()
 
   useEffect(() => {
-    setUser(supabase.auth.getUser())
-    supabase.auth.onAuthStateChange(() => {
-      setUser(supabase.auth.getUser())
-    })
+    async function getSession() {
+      const { data: {session}, error } = await supabase.auth.getSession()
+      setSession(session)
+    }
+    getSession()
   }, [])
+
+  useEffect(() => {
+    async function setUpUser() {
+      if (session?.user.id) {
+        const { data: user } = await supabase.from('users').select('*').eq('id', session.user.id).single()
+        setUser(user)
+      }
+    }
+    setUpUser()
+  }, [session])
 
   const onSignUp = async (email: string, password: string, name: string) => {
     try {
+      setLoading(true);
       const { error: signUpError } = await supabase.auth.signUp(
         {
           email,
@@ -47,11 +60,14 @@ const Provider = ({ children }: any) => {
       router.push('/login')
     } catch (error) {
       alert('エラーが発生しました');
+    } finally {
+      setLoading(false);
     }
   };
 
   const onSignIn = async (email: string, password: string) => {
     try {
+      setLoading(true);
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
       if (signInError) {
         throw signInError
@@ -59,6 +75,8 @@ const Provider = ({ children }: any) => {
       router.push('/')
     } catch (error) {
       alert('エラーが発生しました')
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -96,7 +114,6 @@ const Provider = ({ children }: any) => {
     onSignInWithGitHub,
     onSignOut,
     user,
-    setUser,
     loading
   }
 

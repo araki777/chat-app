@@ -12,18 +12,19 @@ import { useForm } from "@mantine/form";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { Headers } from '@/components/Headers'
 
 const Home: NextPage = () => {
   const [opened, setOpened] = useState(false);
   const [socket, _] = useState(() => io());
   const [rooms, setRooms] = useState([]) as any;
-  const { onSignOut } = useUser();
+  const { user } = useUser();
 
   const form = useForm({
     initialValues: {
       roomName: "",
-      count: 1,
-      isRelease: false,
+      capacity: 1,
+      isRelease: false
     },
 
     validate: {
@@ -33,7 +34,7 @@ const Home: NextPage = () => {
           : value.length > 10
           ? "文字数が多すぎます"
           : null,
-      count: (value) =>
+      capacity: (value) =>
         value < 1
           ? "部屋人数を1人より少なくすることは出来ません"
           : value > 10
@@ -44,25 +45,32 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     socket.emit("room list", _, (replace: any) => {
-      console.log(replace);
+      replace.map((data: any) => (
+        setRooms([...rooms, data.roomName])
+      ))
     });
   }, []);
 
-  const onSubmit = (values: {
-    roomName: string;
-    count: number;
-    isRelease: boolean;
-  }) => {
-    socket.emit("create room", values, (response: string) => {
-      setRooms([...rooms, response]);
+  const onSubmit = (values: any) => {
+    const data = {
+      ...values,
+      userId: user?.id
+    }
+    socket.emit("create room", (data), (response: any) => {
+      if (response) {
+        setRooms([...rooms, response.roomName]);
+      }
     });
     setOpened(false);
   };
 
   return (
     <UserGuard>
-      <button onClick={() => onSignOut()}>サインアウト</button>
+      <Headers />
       <h2>ルーム一覧</h2>
+      { rooms ? rooms.map((data: any) => (
+        <h6>{data}</h6>
+      )) : <h6>部屋がありません</h6> }
       <Modal
         opened={opened}
         onClose={() => setOpened(false)}
@@ -86,7 +94,7 @@ const Home: NextPage = () => {
             defaultValue={1}
             mt="md"
             withAsterisk
-            {...form.getInputProps("count")}
+            {...form.getInputProps("capacity")}
           />
           <Checkbox
             label="公開する"

@@ -11,14 +11,15 @@ const UserGuard = ({ children }: Props) => {
   const { user } = useUser();
   const router = useRouter();
 
-  if (user === null && router.pathname !== '/login' && router.pathname !== '/signUp') {
-    router.push('/login');
-    return null
-  }
+  // if (user === undefined && router.pathname !== '/login' && router.pathname !== '/signUp') {
+  //   router.push('/login');
+  //   return null
+  // }
 
-  if (!user) {
-    return null
-  }
+  // if (user !== undefined && router.pathname === '/login') {
+  //   router.push('/');
+  //   return null
+  // }
 
   return <>{children}</>
 }

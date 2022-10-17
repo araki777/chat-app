@@ -12,7 +12,7 @@ interface SignUpFormInput {
 
 const SignUp: NextPage = () => {
   const router = useRouter()
-  const { onSignUp } = useUser();
+  const { onSignUp, loading } = useUser();
   const form = useForm<SignUpFormInput>({
     initialValues: {
       name: "",
@@ -49,7 +49,7 @@ const SignUp: NextPage = () => {
           {...form.getInputProps('password')}
         />
         <Group position="right" mt="md">
-          <Button type="submit">送信</Button>
+          <Button type="submit" loading={loading}>新規作成</Button>
           <Button onClick={() => router.push('/login')}>ログイン画面へ</Button>
         </Group>
       </form>
