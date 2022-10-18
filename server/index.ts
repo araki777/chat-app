@@ -2,13 +2,12 @@ import express, { Request, Response, Express } from "express";
 import next from "next";
 import { Server, createServer } from "http";
 import { Server as socketioServer, Socket } from "socket.io";
-import { PrismaClient } from "@prisma/client";
+import roomsRouter from './api/rooms';
 
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
 const port = process.env.PORT || 3000;
-const prisma = new PrismaClient();
 
 nextApp.prepare().then(async () => {
   const expressApp: Express = express();
@@ -16,6 +15,10 @@ nextApp.prepare().then(async () => {
   const io: socketioServer = new socketioServer();
 
   io.attach(server);
+
+  expressApp.use(express.json())
+  expressApp.use(express.urlencoded({ extended: true }))
+  expressApp.use('/api/rooms', roomsRouter)
 
   expressApp.all("*", (req: Request, res: Response) => {
     return handle(req, res);
@@ -27,33 +30,18 @@ nextApp.prepare().then(async () => {
 
   io.on("connection", (socket: Socket) => {
     console.log("クライアントと接続しました");
-    socket.on("create room", async (data, callback) => {
-      try {
-        const { roomName, capacity, isRelease, userId } = data;
-        const room = await prisma.rooms.create({
-          data: {
-            room_name: roomName,
-            capacity,
-            isRelease,
-            user_id: userId
-          } as any
-        })
-        const roomId = 'room-' + room.id
-        socket.join(roomId);
-        callback({ roomName: roomName, message: '部屋を作成しました' })
-      } catch(e) {
-        callback(e)
-      }
+
+    socket.on("join", (roomId) => {
+      socket.join(roomId)
+    })
+
+    // チャットをルーム宛てに送る
+    socket.on("sendMessage", (response) => {
+      io.to(response.roomId).emit('giveMessage', response.msg)
     });
 
     socket.on("disconnect", () => {
       console.log("クライアントと切断しました");
-    });
-
-    socket.on("room list", async (_, callback) => {
-      const rooms = await prisma.rooms.findMany();
-      console.log(io.sockets.adapter.rooms)
-      callback(rooms)
     });
   });
 });

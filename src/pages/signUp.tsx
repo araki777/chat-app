@@ -22,7 +22,6 @@ const SignUp: NextPage = () => {
   });
 
   const formOnSubmit = async (data: SignUpFormInput) => {
-    console.log(data);
     const { name, email, password } = data;
     await onSignUp(email, password, name)
   }

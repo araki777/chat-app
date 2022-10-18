@@ -2,6 +2,8 @@ import { createContext, useState, useContext, useEffect, Dispatch, SetStateActio
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/router'
 import { Session, User } from '@supabase/supabase-js';
+import { Socket } from 'socket.io';
+import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 
 type authContextType = {
@@ -11,7 +13,9 @@ type authContextType = {
   onSignInWithGitHub: () => void;
   onSignOut: () => void;
   user: User | undefined,
-  loading: boolean
+  loading: boolean,
+  setSocket: any,
+  socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined
 }
 
 const Context = createContext({} as authContextType)
@@ -21,6 +25,7 @@ const Provider = ({ children }: any) => {
   const [user, setUser] = useState<User | undefined>();
   const [loading, setLoading] = useState(false);
   const router = useRouter()
+  const [socket, setSocket] = useState<Socket<DefaultEventsMap, DefaultEventsMap>>();
 
   useEffect(() => {
     async function getSession() {
@@ -114,7 +119,9 @@ const Provider = ({ children }: any) => {
     onSignInWithGitHub,
     onSignOut,
     user,
-    loading
+    loading,
+    setSocket,
+    socket
   }
 
   return <Context.Provider value={exposed}>{children}</Context.Provider>

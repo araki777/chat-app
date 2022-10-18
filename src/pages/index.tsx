@@ -6,19 +6,64 @@ import {
   Group,
   Modal,
   NumberInput,
+  Switch,
   TextInput,
+  Table,
+  ScrollArea,
+  createStyles
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
-import { Headers } from '@/components/Headers'
+import { io } from "socket.io-client";
+import { Headers } from '@/components/Headers';
+import axios from 'axios';
+import { useRouter } from 'next/router';
+
+const useStyles = createStyles((theme) => ({
+  header: {
+    position: 'sticky',
+    top: 0,
+    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
+    transition: 'box-shadow 150ms ease',
+
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderBottom: `1px solid ${
+        theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.gray[2]
+      }`,
+    },
+  },
+
+  scrolled: {
+    boxShadow: theme.shadows.sm,
+  },
+}));
 
 const Home: NextPage = () => {
   const [opened, setOpened] = useState(false);
-  const [socket, _] = useState(() => io());
-  const [rooms, setRooms] = useState([]) as any;
-  const { user } = useUser();
+  const [rooms, setRooms] = useState<any>([]);
+  const [scrolled, setScrolled] = useState(false);
+  const { classes, cx } = useStyles();
+  const { user, setSocket, socket } = useUser();
+  const router = useRouter();
+
+  const handleRowClick = (row: any) => {
+    router.push(`/chatRooms/${row.id}`)
+  }
+
+  const rows = rooms.map((row: any) => (
+    <tr key={row.id} onClick={() => handleRowClick(row)}>
+      <td>{row.room_name}</td>
+      <td>{row.capacity}</td>
+      <td>{row.user_id}</td>
+      <td>{row.isRelease}</td>
+    </tr>
+  ));
 
   const form = useForm({
     initialValues: {
@@ -44,11 +89,16 @@ const Home: NextPage = () => {
   });
 
   useEffect(() => {
-    socket.emit("room list", _, (replace: any) => {
-      replace.map((data: any) => (
-        setRooms([...rooms, data.roomName])
-      ))
-    });
+
+    // socketがない場合のみ、セットする
+    if (!socket) {
+      setSocket(io())
+    }
+    const firstRoomGet = async () => {
+      const response = await axios.get(`/api/rooms/first-get`);
+      setRooms(response.data.firstRooms);
+    }
+    firstRoomGet()
   }, []);
 
   const onSubmit = (values: any) => {
@@ -56,21 +106,25 @@ const Home: NextPage = () => {
       ...values,
       userId: user?.id
     }
-    socket.emit("create room", (data), (response: any) => {
-      if (response) {
-        setRooms([...rooms, response.roomName]);
+    const createRoom = async () => {
+      const response = await axios.post(`/api/rooms/create`, data)
+      if (response.data) {
+        setRooms([...rooms, response.data])
       }
-    });
+    }
+    createRoom();
     setOpened(false);
   };
+
+  const toggleChange = () => {
+  }
 
   return (
     <UserGuard>
       <Headers />
-      <h2>ルーム一覧</h2>
-      { rooms ? rooms.map((data: any) => (
-        <h6>{data}</h6>
-      )) : <h6>部屋がありません</h6> }
+      <Group position="center" my={30}>
+        <Switch onChange={() => toggleChange()} size="lg" onLabel={<div>グローバル</div>} offLabel={<div>ローカル</div>} />
+      </Group>
       <Modal
         opened={opened}
         onClose={() => setOpened(false)}
@@ -109,6 +163,19 @@ const Home: NextPage = () => {
       <Group position="center">
         <Button onClick={() => setOpened(true)}>ルーム新規作成</Button>
       </Group>
+      <ScrollArea sx={{ height: 400 }} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
+        <Table sx={{ minWidth: 700 }}>
+          <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
+            <tr>
+              <th>部屋名</th>
+              <th>制限人数</th>
+              <th>オーナー</th>
+              <th>公開・非公開</th>
+            </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </Table>
+      </ScrollArea>
     </UserGuard>
   );
 };
