@@ -1,4 +1,4 @@
-import { useUser } from '@/context/user';
+import { useSession } from '@/context/session';
 import {
   Header,
   Group,
@@ -8,7 +8,7 @@ import {
 import { MantineLogo } from '@mantine/ds';
 
 export function Headers() {
-  const { onSignOut } = useUser();
+  const { onSignOut } = useSession();
   return (
     <Box pb={50}>
       <Header height={60} px="md">

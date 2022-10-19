@@ -1,6 +1,6 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useUser } from '@/context/user';
+import { useSession } from '@/context/session';
 import { TextInput, Button, Group, Box } from '@mantine/core';
 import { useForm } from '@mantine/form'
 
@@ -12,7 +12,7 @@ interface SignUpFormInput {
 
 const SignUp: NextPage = () => {
   const router = useRouter()
-  const { onSignUp, loading } = useUser();
+  const { onSignUp, loading } = useSession();
   const form = useForm<SignUpFormInput>({
     initialValues: {
       name: "",

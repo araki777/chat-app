@@ -2,12 +2,15 @@ import express, { Request, Response, Express } from "express";
 import next from "next";
 import { Server, createServer } from "http";
 import { Server as socketioServer, Socket } from "socket.io";
+import usersRouter from './api/users';
 import roomsRouter from './api/rooms';
+import { PrismaClient } from "@prisma/client";
 
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
 const port = process.env.PORT || 3000;
+const prisma = new PrismaClient()
 
 nextApp.prepare().then(async () => {
   const expressApp: Express = express();
@@ -18,6 +21,7 @@ nextApp.prepare().then(async () => {
 
   expressApp.use(express.json())
   expressApp.use(express.urlencoded({ extended: true }))
+  expressApp.use('/api/users', usersRouter)
   expressApp.use('/api/rooms', roomsRouter)
 
   expressApp.all("*", (req: Request, res: Response) => {
@@ -31,7 +35,7 @@ nextApp.prepare().then(async () => {
   io.on("connection", (socket: Socket) => {
     console.log("クライアントと接続しました");
 
-    socket.on("join", (roomId) => {
+    socket.on("join", async (roomId) => {
       socket.join(roomId)
     })
 

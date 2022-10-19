@@ -1,7 +1,7 @@
 import { createContext, useState, useContext, useEffect, Dispatch, SetStateAction } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/router'
-import { Session, User } from '@supabase/supabase-js';
+import { Session } from '@supabase/supabase-js';
 import { Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
@@ -12,7 +12,8 @@ type authContextType = {
   onSignInWithGoogle: () => void;
   onSignInWithGitHub: () => void;
   onSignOut: () => void;
-  user: User | undefined,
+  setUserSession: Dispatch<SetStateAction<Session | null>>
+  userSession: Session | null
   loading: boolean,
   setSocket: any,
   socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined
@@ -21,29 +22,10 @@ type authContextType = {
 const Context = createContext({} as authContextType)
 
 const Provider = ({ children }: any) => {
-  const [session, setSession] = useState<Session | null>()
-  const [user, setUser] = useState<User | undefined>();
+  const [userSession, setUserSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(false);
   const router = useRouter()
   const [socket, setSocket] = useState<Socket<DefaultEventsMap, DefaultEventsMap>>();
-
-  useEffect(() => {
-    async function getSession() {
-      const { data: {session}, error } = await supabase.auth.getSession()
-      setSession(session)
-    }
-    getSession()
-  }, [])
-
-  useEffect(() => {
-    async function setUpUser() {
-      if (session?.user.id) {
-        const { data: user } = await supabase.from('users').select('*').eq('id', session.user.id).single()
-        setUser(user)
-      }
-    }
-    setUpUser()
-  }, [session])
 
   const onSignUp = async (email: string, password: string, name: string) => {
     try {
@@ -109,7 +91,7 @@ const Provider = ({ children }: any) => {
 
   const onSignOut = async () => {
     await supabase.auth.signOut();
-    router.push('/login')
+    router.replace('/login')
   }
 
   const exposed: authContextType = {
@@ -118,7 +100,8 @@ const Provider = ({ children }: any) => {
     onSignInWithGoogle,
     onSignInWithGitHub,
     onSignOut,
-    user,
+    setUserSession,
+    userSession,
     loading,
     setSocket,
     socket
@@ -127,6 +110,6 @@ const Provider = ({ children }: any) => {
   return <Context.Provider value={exposed}>{children}</Context.Provider>
 }
 
-export const useUser = () => useContext(Context)
+export const useSession = () => useContext(Context)
 
 export default Provider

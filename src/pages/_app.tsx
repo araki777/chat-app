@@ -1,11 +1,11 @@
 import type { AppProps } from "next/app";
-import UserProvider from '@/context/user';
+import SessionProvider from '@/context/session';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <UserProvider>
+    <SessionProvider>
       <Component {...pageProps} />
-    </UserProvider>
+    </SessionProvider>
   )
 }
 
