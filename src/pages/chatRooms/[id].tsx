@@ -7,6 +7,8 @@ import { IconSend } from '@tabler/icons'
 import { SessionGuard } from '@/guards/SessionGuard'
 import { Headers } from '@/components/Headers'
 import { useInputState } from '@mantine/hooks'
+import { io } from 'socket.io-client';
+import axios from 'axios';
 
 const chatRoomPage: NextPage = () => {
   const router = useRouter()
@@ -14,6 +16,10 @@ const chatRoomPage: NextPage = () => {
   const { socket } = useSession();
   const [stringValue, setStringValue] = useInputState<string>("");
   const [chat, setChat] = useState<string[]>([]);
+
+  useEffect(() => {
+    socket?.emit('join', roomId)
+  })
 
   const sendMessage: any = () => {
     socket?.emit('sendMessage', { roomId: roomId, msg: stringValue })

@@ -14,7 +14,6 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
 import { Headers } from '@/components/Headers';
 import axios from 'axios';
 import { useRouter } from 'next/router';
@@ -49,7 +48,7 @@ const ChatHome: NextPage = () => {
   const [rooms, setRooms] = useState<any>([]);
   const [scrolled, setScrolled] = useState(false);
   const { classes, cx } = useStyles();
-  const { setSocket, socket } = useSession();
+  const { socket, sessionUser } = useSession();
   const router = useRouter();
 
   const handleRowClick = (row: any) => {
@@ -90,33 +89,38 @@ const ChatHome: NextPage = () => {
 
   useEffect(() => {
 
-    // socketがない場合のみ、セットする
-    if (!socket) {
-      setSocket(io())
+    // ログインユーザーが登録されている部屋に参加
+    if (sessionUser?.join_room_list.length) {
+      axios.post('/api/rooms/join_room', {
+        userId: sessionUser.id,
+        joinRoomList: sessionUser.join_room_list
+      }).then((res) => {
+        if (res.data) {
+          res.data.forEach(async (room: any) => {
+            socket?.emit('join', room.id)
+          })
+        }
+        setRooms(res.data);
+      })
+      rooms.forEach((value: any) => {
+        socket?.emit('join', value.id)
+      })
     }
-
-    // socket?.emit('join', user?.data.join_room_list)
-
-    const firstRoomGet = async () => {
-      const response = await axios.get(`/api/rooms/first-get`);
-      setRooms(response.data.firstRooms);
-    }
-    firstRoomGet()
   }, []);
 
   const onSubmit = (values: any) => {
-    // const data = {
-    //   ...values,
-    //   userId: user?.data.id
-    // }
-    // const createRoom = async () => {
-    //   const response = await axios.post(`/api/rooms/create`, data)
-    //   if (response.data) {
-    //     setRooms([...rooms, response.data])
-    //   }
-    // }
-    // createRoom();
-    // setOpened(false);
+    const data = {
+      ...values,
+      userId: sessionUser?.id
+    }
+    const createRoom = async () => {
+      const response = await axios.post(`/api/rooms/create`, data)
+      if (response.data) {
+        setRooms([...rooms, response.data])
+      }
+    }
+    createRoom();
+    setOpened(false);
   };
 
   const toggleChange = () => {

@@ -1,10 +1,19 @@
 import { createContext, useState, useContext, useEffect, Dispatch, SetStateAction } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/router'
-import { Session } from '@supabase/supabase-js';
 import { Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
+import { AxiosResponse } from 'axios';
 
+type sessionUserType = {
+  id: string,
+  email: string,
+  user_name: string,
+  avatar_url: string,
+  created_at: Date,
+  join_room_list: string[],
+  updated_at: Date
+}
 
 type authContextType = {
   onSignUp: (email: string, password: string, name: string) => Promise<void>;
@@ -12,8 +21,8 @@ type authContextType = {
   onSignInWithGoogle: () => void;
   onSignInWithGitHub: () => void;
   onSignOut: () => void;
-  setUserSession: Dispatch<SetStateAction<Session | null>>
-  userSession: Session | null
+  setSessionUser: Dispatch<SetStateAction<sessionUserType | null>>
+  sessionUser: sessionUserType | null
   loading: boolean,
   setSocket: any,
   socket: Socket<DefaultEventsMap, DefaultEventsMap> | undefined
@@ -22,7 +31,7 @@ type authContextType = {
 const Context = createContext({} as authContextType)
 
 const Provider = ({ children }: any) => {
-  const [userSession, setUserSession] = useState<Session | null>(null)
+  const [sessionUser, setSessionUser] = useState<sessionUserType | null>(null)
   const [loading, setLoading] = useState(false);
   const router = useRouter()
   const [socket, setSocket] = useState<Socket<DefaultEventsMap, DefaultEventsMap>>();
@@ -100,8 +109,8 @@ const Provider = ({ children }: any) => {
     onSignInWithGoogle,
     onSignInWithGitHub,
     onSignOut,
-    setUserSession,
-    userSession,
+    setSessionUser,
+    sessionUser,
     loading,
     setSocket,
     socket

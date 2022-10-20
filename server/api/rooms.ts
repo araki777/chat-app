@@ -4,11 +4,28 @@ import { PrismaClient } from "@prisma/client";
 const router = express.Router();
 const prisma = new PrismaClient();
 
-router.get('/first-get', async (_req, res) => {
-  const firstRooms = await prisma.rooms.findMany({
-    take: 10
-  })
-  res.json({ firstRooms })
+router.post('/join_room', async (req, res) => {
+  try {
+    const { userId, joinRoomList } = req.body
+    const roomLists = await prisma.rooms.findMany({
+      where: {
+        AND: {
+          id: {
+            in: joinRoomList
+          }
+        }
+      },
+      select: {
+        id: true,
+        room_name: true,
+        user_id: true,
+        isRelease: true
+      }
+    })
+    res.json(roomLists)
+  } catch (e) {
+    res.json(e)
+  }
 })
 
 router.post('/create', async (req, res) => {
