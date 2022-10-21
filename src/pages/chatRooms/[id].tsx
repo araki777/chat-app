@@ -6,34 +6,36 @@ import { Input } from '@mantine/core';
 import { IconSend } from '@tabler/icons'
 import { SessionGuard } from '@/guards/SessionGuard'
 import { Headers } from '@/components/Headers'
-import { useInputState } from '@mantine/hooks'
-import { io } from 'socket.io-client';
+import { useInputState, useShallowEffect } from '@mantine/hooks'
 import axios from 'axios';
 
 const chatRoomPage: NextPage = () => {
   const router = useRouter()
   const roomId = router.query.id
-  const { socket } = useSession();
+  const { socket, sessionUser } = useSession();
   const [stringValue, setStringValue] = useInputState<string>("");
-  const [chat, setChat] = useState<string[]>([]);
+  const [message, setMessage] = useState<string[]>([]);
 
-  useEffect(() => {
-    socket?.emit('join', roomId)
-  })
+  // useEffect(() => {
+  //   axios.get('/api/messages', { params: { roomId: roomId } }).then((res) => {
+  //     console.log(res);
+  //     setMessage(res.data)
+  //   })
+  // }, [])
 
   const sendMessage: any = () => {
-    socket?.emit('sendMessage', { roomId: roomId, msg: stringValue })
+    socket?.emit('sendMessage', { userId: sessionUser?.id, roomId: roomId, msg: stringValue })
     setStringValue('')
   }
 
   socket?.on('giveMessage', (response) => {
-    setChat([...chat, response])
+    setMessage([...message, response])
   })
 
   return (
     <SessionGuard>
       <Headers />
-      { chat ? chat.map((data) => (
+      { message ? message.map((data) => (
         <div key={data}>{data}</div>
       )) : <></> }
       <Input value={stringValue} placeholder="メッセージを入力してください" rightSection={<IconSend onClick={() => sendMessage()} />} onChange={setStringValue} />

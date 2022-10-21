@@ -15,7 +15,7 @@ model rooms {
   isRelease  Boolean?   @default(false)
   user_id    String?    @db.Uuid
   updated_at DateTime?  @default(now()) @db.Timestamptz(6)
-  black_list String[]
+  black_list String[]   @default([])
   users      users?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   messages   messages[]
 }

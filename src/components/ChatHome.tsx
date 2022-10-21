@@ -91,19 +91,8 @@ const ChatHome: NextPage = () => {
 
     // ログインユーザーが登録されている部屋に参加
     if (sessionUser?.join_room_list.length) {
-      axios.post('/api/rooms/join_room', {
-        userId: sessionUser.id,
-        joinRoomList: sessionUser.join_room_list
-      }).then((res) => {
-        if (res.data) {
-          res.data.forEach(async (room: any) => {
-            socket?.emit('join', room.id)
-          })
-        }
-        setRooms(res.data);
-      })
-      rooms.forEach((value: any) => {
-        socket?.emit('join', value.id)
+      socket?.emit('joinUserRoom', { joinRoomList: sessionUser.join_room_list, userId: sessionUser.id }, (response: []) => {
+        setRooms(response);
       })
     }
   }, []);
@@ -113,13 +102,9 @@ const ChatHome: NextPage = () => {
       ...values,
       userId: sessionUser?.id
     }
-    const createRoom = async () => {
-      const response = await axios.post(`/api/rooms/create`, data)
-      if (response.data) {
-        setRooms([...rooms, response.data])
-      }
-    }
-    createRoom();
+    socket?.emit('createRoom', data, (response: any) => {
+      setRooms([...rooms, response]);
+    })
     setOpened(false);
   };
 
