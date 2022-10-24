@@ -5,8 +5,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // roomに紐づく作成日が30日前までのデータを取得する
-router.post('/', async (req, res) => {
-  console.log(req.params);
+router.get('/', async (req, res) => {
   const today = new Date()
   const todaybefore30 = new Date(today.setDate(today.getDate() - 30))
   const messages = await prisma.messages.findMany({
@@ -21,6 +20,14 @@ router.post('/', async (req, res) => {
           }
         }
       ]
+    },
+    orderBy: {
+      created_at: 'asc'
+    },
+    select: {
+      id: true,
+      message: true,
+      user_id: true
     }
   })
 

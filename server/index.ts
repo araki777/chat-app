@@ -43,7 +43,6 @@ nextApp.prepare().then(async () => {
         socket.join(res.id)
       })
 
-      console.log(io.sockets.adapter.rooms);
       callback(userJoinRooms)
     })
 
@@ -57,7 +56,7 @@ nextApp.prepare().then(async () => {
     // チャットをルーム宛てに送る
     socket.on("sendMessage", async (response) => {
       const message = await createMessage(response)
-      io.to(message.room_id as string).emit('giveMessage', message.message)
+      io.to(message.room_id as string).emit('giveMessage', { id: message.id, message: message.message, user_id: message.user_id })
     });
 
     socket.on("disconnect", () => {
