@@ -1,32 +1,44 @@
 import { useSession } from '@/context/session'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Button, Box, Paper, Text } from '@mantine/core';
 import { IconSend } from '@tabler/icons'
 import { SessionGuard } from '@/guards/SessionGuard'
 import { Headers } from '@/components/Headers'
 import { useInputState } from '@mantine/hooks'
 import axios from 'axios';
-import { RichTextEditor } from '@mantine/rte'
+import RichTextEditor from '@/components/RichText';
 
 const chatRoomPage: NextPage = () => {
   const router = useRouter()
-  const roomId = router.query.id
   const { socket, sessionUser } = useSession();
   const [stringValue, setStringValue] = useInputState<string>("");
   const [message, setMessage] = useState<any[]>([]);
-  const [ value, onChange ] = useState<any>();
+  const [room, setRoom] = useState<string>("");
 
-  useEffect(() => {
-    axios.get('/api/messages', { params: { roomId: roomId } }).then((res) => {
-      console.log(res);
+  // メッセージ取得処理
+  const getMessage = async () => {
+    await axios.get('/api/messages', { params: { roomId: room } }).then((res) => {
       setMessage([...res.data])
     })
-  }, [])
+  }
+
+  // router.queryまで読み込まれたら、roomをセット
+  useEffect(() => {
+    if (router.asPath !== router.route) {
+      setRoom(router.query.id as string)
+    }
+  }, [router])
+
+  // roomがセットされたら、メッセージを取得
+  useEffect(() => {
+    getMessage()
+  }, [room])
 
   const sendMessage: any = () => {
-    socket?.emit('sendMessage', { userId: sessionUser?.id, roomId: roomId, msg: stringValue })
+    console.log(stringValue);
+    socket?.emit('sendMessage', { userId: sessionUser?.id, roomId: room, msg: stringValue })
     setStringValue('')
   }
 
@@ -60,7 +72,7 @@ const chatRoomPage: NextPage = () => {
                     filter: "drop-shadow(-1px 1px 1px rgb(0 0 0 / 5%))"
                   }
                   }}>
-                  <Text sx={{ maxWidth: 400 }} size="xs">{data.message}</Text>
+                  <Text sx={{ maxWidth: 400 }} size="xs" dangerouslySetInnerHTML={{ __html: data.message }} />
                 </Paper>
               </Box>
             ) : (
@@ -83,13 +95,13 @@ const chatRoomPage: NextPage = () => {
                     filter: "drop-shadow(-1px 1px 1px rgb(0 0 0 / 5%))"
                   }
                   }}>
-                  <Text sx={{ maxWidth: 400 }} size="xs">{data.message}</Text>
+                  <Text sx={{ maxWidth: 400 }} size="xs" dangerouslySetInnerHTML={{ __html: data.message }} />
                 </Paper>
               </Box>
             ))
           )) : <></> }
         </Box>
-        <RichTextEditor value={value} onChange={onChange} id="rte" controls={[
+        <RichTextEditor value={stringValue} onChange={setStringValue} id="rte" controls={[
           ['bold', 'italic', 'underline', 'link', 'image'],
           ['unorderedList', 'h1', 'h2'],
           ['alignLeft', 'alignCenter', 'alignRight']
@@ -100,10 +112,9 @@ const chatRoomPage: NextPage = () => {
           width: 40,
           paddingLeft: 10,
           paddingRight: 10
-          }}>
-          <IconSend onClick={() => sendMessage()} />
+          }} onClick={() => sendMessage()}>
+          <IconSend />
         </Button>
-          {/* <Input value={stringValue} placeholder="メッセージを入力してください" rightSection={<IconSend onClick={() => sendMessage()} />} onChange={setStringValue} /> */}
       </Box>
     </SessionGuard>
   )
