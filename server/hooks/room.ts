@@ -2,31 +2,35 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const fetchUserJoinRoom = async (joinRoomList: string[], userId: string) => {
+export const fetchUserJoinRoom = async (
+  joinRoomList: string[],
+  userId: string
+) => {
   const userJoinRooms = await prisma.rooms.findMany({
     where: {
       AND: {
         id: {
-          in: joinRoomList
-        }
+          in: joinRoomList,
+        },
       },
       NOT: {
         black_list: {
-          has: userId
-        }
-      }
+          has: userId,
+        },
+      },
     },
     select: {
       id: true,
       room_name: true,
       user_id: true,
-      isRelease: true
+      isRelease: true,
+      capacity: true,
     },
-    orderBy: { updated_at: 'desc' }
-  })
+    orderBy: { updated_at: "desc" },
+  });
 
-  return userJoinRooms
-}
+  return userJoinRooms;
+};
 
 export const createRoom = async (response: any) => {
   const room = await prisma.rooms.create({
@@ -34,18 +38,18 @@ export const createRoom = async (response: any) => {
       capacity: response.capacity,
       isRelease: response.isRelease,
       room_name: response.roomName,
-      user_id: response.userId
-    }
-  })
+      user_id: response.userId,
+    },
+  });
   await prisma.users.update({
     where: {
-      id: response.userId
+      id: response.userId,
     },
     data: {
       join_room_list: {
-        push: room.id
-      }
-    }
-  })
-  return room
-}
+        push: room.id,
+      },
+    },
+  });
+  return room;
+};
