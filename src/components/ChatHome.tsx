@@ -14,7 +14,7 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect, useState } from "react";
-import { Headers } from '@/components/Headers';
+import { Headers } from '@/components/Headers'
 import { useRouter } from 'next/router';
 
 

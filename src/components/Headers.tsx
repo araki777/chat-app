@@ -10,7 +10,7 @@ import { MantineLogo } from '@mantine/ds';
 export function Headers() {
   const { onSignOut } = useSession();
   return (
-    <Box pb={50}>
+    <Box>
       <Header height={60} px="md">
         <Group position="apart" sx={{ height: '100%' }}>
           <MantineLogo size={30} />
