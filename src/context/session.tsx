@@ -3,7 +3,6 @@ import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/router'
 import { Socket } from 'socket.io';
 import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { AxiosResponse } from 'axios';
 
 type sessionUserType = {
   id: string,

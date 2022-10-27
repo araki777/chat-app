@@ -4,7 +4,6 @@ import { supabase } from '@/lib/supabase'
 import { useSession } from '@/context/session'
 import axios from 'axios'
 import { io } from 'socket.io-client'
-import { response } from 'express'
 
 type Props = {
   children: ReactNode
@@ -22,39 +21,40 @@ export const SessionGuard = ({ children }: Props) => {
       setAuthorized(false)
     };
     router.events.on('routeChangeStart', hideContent);
-    router.events.on('routeChangeComplete', authCheck);
 
     return () => {
       router.events.off('routeChangeStart', hideContent);
-      router.events.off('routeChangeComplete', authCheck);
     }
-  }, [])
+  }, [router])
+
+  useEffect(() => {
+    if (sessionUser && !socket) {
+      setSocket(() => io())
+    }
+  }, [sessionUser])
 
   const authCheck = async (url: string) => {
     const path = url.split('/')[1];
-    const { data, error } = await supabase.auth.getSession()
+    const { data: { session }, error } = await supabase.auth.getSession()
 
-    if (data.session && !sessionUser) {
-      const response = await axios.post(`/api/users/${data.session.user.id}`)
+    // セッションを取得しているが、セッションユーザーが取得出来ていない場合
+    if (session && !sessionUser) {
+      const response = await axios.post(`/api/users/${session.user.id}`)
       setSessionUser(response.data.user)
-
-      if (!socket) {
-        setSocket(() => io())
-      }
     }
 
-    if (data.session !== null && path === 'login') {
-      setAuthorized(true);
-      router.push('/')
+    // セッションを取得している状態でログイン画面へ遷移した場合
+    if (session && path === 'login') {
+      return router.push('/')
     }
 
-    if (data.session === null && path !== 'login') {
-      setAuthorized(false);
-      router.push('/login')
-      return null
-    } else {
-      setAuthorized(true);
+    // セッションを取得していない状態でログイン画面以外へ遷移した場合
+    if (!session && path !== 'login') {
+      return router.push('/login')
     }
+
+    // return処理に引っかからなかった場合
+    setAuthorized(true)
   }
 
   return authorized ? <>{ children }</> : null
