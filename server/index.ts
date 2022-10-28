@@ -75,6 +75,12 @@ nextApp.prepare().then(async () => {
       }
     })
 
+    // 他のユーザーに自身の動画情報を送信
+    socket.on("sendVideo", async (response) => {
+      console.log(response);
+      io.to(response.roomId).emit('giveVideo', response.stream)
+    })
+
     socket.on("disconnect", () => {
       console.log("クライアントと切断しました");
     });
