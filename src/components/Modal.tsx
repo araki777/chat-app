@@ -1,6 +1,6 @@
 import { Modal } from "@mantine/core";
 import { Dispatch, FC, SetStateAction } from "react";
-import { CreateRoomForm } from "@/components/Form";
+import CreateRoomForm from "@/components/CreateRoomForm";
 import { roomType } from "@/types/room";
 
 type Props = {
