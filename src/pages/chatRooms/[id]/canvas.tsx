@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react'
+import { FC } from 'react'
 import dynamic from 'next/dynamic'
 import { Box } from '@mantine/core'
 
