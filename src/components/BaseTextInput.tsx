@@ -1,5 +1,5 @@
 import { TextInput } from "@mantine/core";
-import { FC, useMemo } from "react";
+import { FC } from "react";
 
 interface Props {
   placeholder: string;
@@ -10,7 +10,7 @@ interface Props {
   sx?: {[key: string]: string}
 }
 
-const FormTextInput: FC<Props> = (props) => {
+const BaseTextInput: FC<Props> = (props) => {
   return (
     <TextInput
       placeholder={props.placeholder}
@@ -23,4 +23,4 @@ const FormTextInput: FC<Props> = (props) => {
   )
 };
 
-export default FormTextInput
+export default BaseTextInput

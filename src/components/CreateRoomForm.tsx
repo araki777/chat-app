@@ -2,10 +2,10 @@ import { useForm } from "@mantine/form";
 import { Dispatch, FC, SetStateAction, useState } from "react";
 import { roomType } from "@/types/room";
 import { useSession } from "@/context/session";
-import FormTextInput from "@/components/FormTextInput"
+import BaseTextInput from "@/components/BaseTextInput"
 import FormNumberInput from "@/components/FormNumberInput"
 import FormCheckBox from "@/components/FormCheckBox";
-import FormButton from "@/components/FormButton"
+import BaseButton from "@/components/BaseButton"
 
 interface createRoomFormProps {
   setOpened: Dispatch<SetStateAction<boolean>>;
@@ -69,10 +69,10 @@ const CreateRoomForm: FC<createRoomFormProps> = ({
 
   return (
     <form onSubmit={form.onSubmit((values) => onSubmit(values))}>
-      <FormTextInput placeholder="部屋名を入力してください" label="部屋名" withAsterisk={true} description="10文字まで" value={form.getInputProps("roomName")} />
+      <BaseTextInput placeholder="部屋名を入力してください" label="部屋名" withAsterisk={true} description="10文字まで" value={form.getInputProps("roomName")} />
       <FormNumberInput placeholder="人数を入力してください" label="部屋人数" withAsterisk={true} description="最大10人まで" max={10} min={1} defaultValue={1} value={form.getInputProps("capacity")} sx={{ marginTop: "16px" }} />
       <FormCheckBox label="公開する" value={form.getInputProps("isRelease", { type: "checkbox" })} sx={{ marginTop: "16px" }} />
-      <FormButton type="submit" sx={{ float: "right", color: "#fff", background: "#845EF7", marginTop: "16px" }} value="作成" loading={loading} />
+      <BaseButton type="submit" sx={{ float: "right", color: "#fff", background: "#845EF7", marginTop: "16px" }} value="作成" loading={loading} />
     </form>
   );
 };

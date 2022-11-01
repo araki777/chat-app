@@ -1,14 +1,15 @@
 import { Button } from "@mantine/core";
-import { FC } from "react";
+import React, { FC, ReactNode } from "react";
 
 interface Props {
   type: "button" | "submit" | "reset" | undefined;
-  value: string;
+  value: string | ReactNode;
   sx?: {[key: string]: string}
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
   loading: boolean
 }
 
-const FormButton: FC<Props> = (props) => {
+const BaseButton: FC<Props> = (props) => {
   return (
     <Button type={props.type} sx={props.sx} loading={props.loading}>
       {props.value}
@@ -16,4 +17,4 @@ const FormButton: FC<Props> = (props) => {
   )
 };
 
-export default FormButton
+export default BaseButton
