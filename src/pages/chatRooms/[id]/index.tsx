@@ -5,11 +5,12 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Button, Box, Paper, Text } from '@mantine/core';
 import { IconSend } from '@tabler/icons'
 import { SessionGuard } from '@/guards/SessionGuard'
-import { Headers } from '@/components/Headers'
+import Headers from '@/modules/Headers'
 import { useInputState } from '@mantine/hooks'
 import axios from 'axios';
 import RichTextEditor from '@/components/RichText';
 import BaseNavbar from '@/modules/Navbar';
+import HomeHeaderContents from '@/components/HomeHeaderContents';
 
 const chatRoomPage: NextPage = () => {
   const router = useRouter()
@@ -48,7 +49,7 @@ const chatRoomPage: NextPage = () => {
 
   return (
     <SessionGuard>
-      <Headers />
+      <Headers children={<HomeHeaderContents />} />
       <Box sx={{ display: 'flex', height: "calc(100vh - 60px)" }}>
         <BaseNavbar />
         <Box sx={{ height: "100%", paddingTop: 10, width: "100%" }}>

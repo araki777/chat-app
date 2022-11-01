@@ -3,11 +3,12 @@ import type { NextPage } from "next";
 import { useSession } from "@/context/session";
 import { Button, Group, Switch } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { Headers } from "@/components/Headers";
+import Headers from "@/modules/Headers";
 import { useRouter } from "next/router";
 import BaseTable from "@/components/Table";
 import BaseModal from "@/components/Modal";
 import { roomType } from "@/types/room";
+import HomeHeaderContents from "@/components/HomeHeaderContents";
 
 const ChatHome: NextPage = () => {
   const [rooms, setRooms] = useState<roomType[]>([]);
@@ -38,7 +39,7 @@ const ChatHome: NextPage = () => {
 
   return (
     <SessionGuard>
-      <Headers />
+      <Headers children={<HomeHeaderContents />} />
       <BaseModal
         opened={opened}
         setOpened={setOpened}

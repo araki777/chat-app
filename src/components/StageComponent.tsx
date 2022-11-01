@@ -1,11 +1,12 @@
 import { FC, ReactNode, useEffect, useState } from 'react'
 import { Stage, Layer, Line } from 'react-konva'
-import { Headers } from '@/components/Headers'
+import Headers from '@/modules/Headers'
 import { useSession } from '@/context/session';
 import SessionGuard from '@/guards/SessionGuard';
 import { useRouter } from 'next/router';
 import { ThemeIcon } from '@mantine/core';
 import { IconPhone } from '@tabler/icons';
+import CanvasHeaderContents from './CanvasHeaderContents';
 
 type Props = {
   width: number;
@@ -101,7 +102,7 @@ const StageComponent: FC = () => {
 
   return (
     <SessionGuard>
-      <Headers />
+      <Headers children={<CanvasHeaderContents />} />
       { userMouseList }
       <Stage
         width={window.innerWidth}

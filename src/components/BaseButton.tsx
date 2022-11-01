@@ -6,12 +6,12 @@ interface Props {
   value: string | ReactNode;
   sx?: {[key: string]: string}
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
-  loading: boolean
+  loading?: boolean
 }
 
 const BaseButton: FC<Props> = (props) => {
   return (
-    <Button type={props.type} sx={props.sx} loading={props.loading}>
+    <Button type={props.type} sx={props.sx} loading={props.loading} onClick={props.onClick}>
       {props.value}
     </Button>
   )
