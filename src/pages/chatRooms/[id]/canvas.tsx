@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import dynamic from 'next/dynamic'
+import Headers from '@/modules/Headers'
 import { Box } from '@mantine/core'
 
 // react-konvaを使用しているコンポーネントはdynamic importを利用する
@@ -8,9 +9,15 @@ const StageComponent = dynamic(() => import('@/components/StageComponent'), { ss
 const CanvasPage: FC = () => {
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <StageComponent />
-    </Box>
+    <>
+      <Headers>
+        <></>
+      </Headers>
+      <Box sx={{ display: 'flex' }}>
+        <Box sx={{ width: "300px", borderRight: "1px solid #e9ecef" }} />
+        <StageComponent />
+      </Box>
+    </>
   )
 }
 
