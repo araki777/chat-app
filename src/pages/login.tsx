@@ -8,24 +8,24 @@ import {
   Title,
   Group,
   Grid,
+  Box,
+  BackgroundImage,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import Link from "next/link";
 import { useSession } from "@/context/session";
 import { SessionGuard } from "@/guards/SessionGuard";
+import { showNotification } from "@mantine/notifications";
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
-    minHeight: 900,
-    backgroundSize: "cover",
-    backgroundImage: "url(https://source.unsplash.com/random)",
+    display: "flex",
   },
 
   form: {
     borderRight: `1px solid ${
       theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[3]
     }`,
-    minHeight: 900,
     maxWidth: 450,
     paddingTop: 80,
 
@@ -46,6 +46,23 @@ const useStyles = createStyles((theme) => ({
     marginLeft: "auto",
     marginRight: "auto",
   },
+
+  input: {
+    [`input[type="text"]:focus`]: {
+      border: "1px solid #7f7fff",
+    },
+    [`.mantine-PasswordInput-input:focus-within`]: {
+      border: "1px solid #7f7fff",
+    },
+  },
+
+  button: {
+    background: "#ced4da",
+    webkitTransition: "all 0.3s ease",
+    mozTransition: "all 0.3s ease",
+    oTransition: "all 0.3s ease",
+    transition: "all  0.3s ease",
+  },
 }));
 
 interface SignInFormInput {
@@ -55,17 +72,34 @@ interface SignInFormInput {
 
 const SignIn: NextPage = () => {
   const { classes } = useStyles();
-  const { onSignIn, onSignInWithGoogle, onSignInWithGitHub, loading } = useSession();
+  const { onSignIn, onSignInWithGoogle, onSignInWithGitHub, loading } =
+    useSession();
   const form = useForm<SignInFormInput>({
     initialValues: {
       email: "",
       password: "",
     },
+    validate: {
+      email: (value) =>
+        /^[\w\-._]+@[\w\-._]+\.[A-Za-z]+/.test(value)
+          ? null
+          : "無効なメールアドレスです",
+      password: (value) =>
+        value.length < 2 ? "Name must have at least 2 letters" : null,
+    },
   });
+
+  const handleError = (errors: typeof form.errors) => {
+    if (errors.email) {
+      showNotification({ message: "メールアドレスを入力してください" });
+    } else if (errors.password) {
+      showNotification({ message: "パスワードを入力してください" });
+    }
+  };
 
   const formOnSubmit = async (data: SignInFormInput) => {
     const { email, password } = data;
-    await onSignIn(email, password);
+    // await onSignIn(email, password);
   };
 
   return (
@@ -73,32 +107,41 @@ const SignIn: NextPage = () => {
       <div className={classes.wrapper}>
         <Paper className={classes.form} radius={0} p={30}>
           <Title
-            order={2}
+            order={1}
             className={classes.title}
             align="center"
             mt="md"
             mb={50}
+            sx={{ fontFamily: "Griffy !important" }}
           >
-            My App
+            Talk Out
           </Title>
 
-          <form onSubmit={form.onSubmit(formOnSubmit)}>
+          <form onSubmit={form.onSubmit(formOnSubmit, handleError)}>
             <TextInput
               withAsterisk
               label="メールアドレス"
-              placeholder="メールアドレスを入力してください"
-              size="md"
+              placeholder="aaa@example.com"
+              size="xs"
+              className={classes.input}
               {...form.getInputProps("email")}
             />
             <PasswordInput
               withAsterisk
               label="パスワード"
-              placeholder="パスワードを入力してください"
+              placeholder="password"
               mt="md"
-              size="md"
+              size="xs"
+              className={classes.input}
               {...form.getInputProps("password")}
             />
-            <Button type="submit" mt="xl" fullWidth loading={loading}>
+            <Button
+              type="submit"
+              mt="xl"
+              fullWidth
+              loading={loading}
+              className={classes.button}
+            >
               ログイン
             </Button>
             <Grid justify="space-around" mt="xl">
@@ -155,6 +198,7 @@ const SignIn: NextPage = () => {
             </Group>
           </form>
         </Paper>
+        <BackgroundImage src="https://source.unsplash.com/random" />
       </div>
     </SessionGuard>
   );
