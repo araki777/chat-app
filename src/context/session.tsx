@@ -2,7 +2,6 @@ import {
   createContext,
   useState,
   useContext,
-  useEffect,
   Dispatch,
   SetStateAction,
 } from "react";
@@ -24,8 +23,9 @@ type sessionUserType = {
 type authContextType = {
   onSignUp: (email: string, password: string, name: string) => Promise<void>;
   onSignIn: (email: string, password: string) => Promise<void>;
-  onSignInWithGoogle: () => void;
+  onSignInWithTwitter: () => void;
   onSignInWithGitHub: () => void;
+  onSignInWithGoogle: () => void;
   onSignOut: () => void;
   setSessionUser: Dispatch<SetStateAction<sessionUserType | null>>;
   sessionUser: sessionUserType | null;
@@ -84,10 +84,23 @@ const Provider = ({ children }: any) => {
     }
   };
 
-  const onSignInWithGoogle = async () => {
+  const onSignInWithTwitter = async () => {
     try {
       const { error: signInError } = await supabase.auth.signInWithOAuth({
-        provider: "google",
+        provider: "twitter"
+      })
+      if (signInError) {
+        throw signInError
+      }
+    } catch (error) {
+      alert("エラーが発生しました")
+    }
+  }
+
+  const onSignInWithGitHub = async () => {
+    try {
+      const { error: signInError } = await supabase.auth.signInWithOAuth({
+        provider: "github",
       });
       if (signInError) {
         throw signInError;
@@ -97,10 +110,10 @@ const Provider = ({ children }: any) => {
     }
   };
 
-  const onSignInWithGitHub = async () => {
+  const onSignInWithGoogle = async () => {
     try {
       const { error: signInError } = await supabase.auth.signInWithOAuth({
-        provider: "github",
+        provider: "google",
       });
       if (signInError) {
         throw signInError;
@@ -118,6 +131,7 @@ const Provider = ({ children }: any) => {
   const exposed: authContextType = {
     onSignUp,
     onSignIn,
+    onSignInWithTwitter,
     onSignInWithGoogle,
     onSignInWithGitHub,
     onSignOut,

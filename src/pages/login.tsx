@@ -73,7 +73,7 @@ interface SignInFormInput {
 
 const SignIn: NextPage = () => {
   const { classes } = useStyles();
-  const { onSignIn, onSignInWithGoogle, onSignInWithGitHub, loading } =
+  const { onSignIn, onSignInWithTwitter, onSignInWithGoogle, onSignInWithGitHub, loading } =
     useSession();
   const form = useForm<SignInFormInput>({
     initialValues: {
@@ -145,7 +145,7 @@ const SignIn: NextPage = () => {
             />
             <Group mt="xl">
               <Avatar
-                onClick={onSignInWithGitHub}
+                onClick={onSignInWithTwitter}
                 sx={{
                   borderRadius: 50,
                   margin: "auto",
@@ -205,7 +205,7 @@ const SignIn: NextPage = () => {
                 </svg>
               </Avatar>
               <Avatar
-                onClick={onSignInWithGitHub}
+                onClick={onSignInWithGoogle}
                 sx={{
                   borderRadius: 50,
                   margin: "auto",
