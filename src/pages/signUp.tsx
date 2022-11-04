@@ -1,8 +1,21 @@
-import { NextPage } from 'next';
-import { useRouter } from 'next/router';
-import { useSession } from '@/context/session';
-import { TextInput, Button, Group, Box } from '@mantine/core';
-import { useForm } from '@mantine/form'
+import { NextPage } from "next";
+import { useRouter } from "next/router";
+import { useSession } from "@/context/session";
+import {
+  TextInput,
+  Button,
+  Group,
+  Box,
+  Container,
+  Title,
+  Anchor,
+  Paper,
+  PasswordInput,
+  Checkbox,
+  Text,
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useStyles } from "@/styles/pages/signUp";
 
 interface SignUpFormInput {
   name: string;
@@ -11,49 +24,54 @@ interface SignUpFormInput {
 }
 
 const SignUp: NextPage = () => {
-  const router = useRouter()
+  const { classes } = useStyles();
+  const router = useRouter();
   const { onSignUp, loading } = useSession();
   const form = useForm<SignUpFormInput>({
     initialValues: {
       name: "",
       email: "",
-      password: ""
+      password: "",
     },
   });
 
   const formOnSubmit = async (data: SignUpFormInput) => {
     const { name, email, password } = data;
-    await onSignUp(email, password, name)
-  }
+    await onSignUp(email, password, name);
+  };
 
   return (
-    <Box sx={{ maxWidth: 300 }} mx="auto">
-      <form onSubmit={form.onSubmit(formOnSubmit)}>
+    <Container size={420} my={40} className={classes.container}>
+      <Title className={classes.title}>アカウントを作成</Title>
+      <Paper withBorder shadow="md" p={30} mt={30} radius="md">
         <TextInput
           withAsterisk
           label="氏名"
           placeholder="名前を入力してください"
-          {...form.getInputProps('name')}
+          {...form.getInputProps("name")}
         />
         <TextInput
           withAsterisk
+          mt="md"
           label="メールアドレス"
           placeholder="メールアドレスを入力してください"
-          {...form.getInputProps('email')}
+          {...form.getInputProps("email")}
         />
-        <TextInput
-          withAsterisk
+        <PasswordInput
           label="パスワード"
           placeholder="パスワードを入力してください"
-          {...form.getInputProps('password')}
+          mt="md"
+          {...form.getInputProps("password")}
         />
         <Group position="right" mt="md">
-          <Button type="submit" loading={loading}>新規作成</Button>
-          <Button onClick={() => router.push('/login')}>ログイン画面へ</Button>
+          <Button type="submit" loading={loading}>
+            アカウント登録
+          </Button>
+          <Button onClick={() => router.push("/login")}>戻る</Button>
         </Group>
-      </form>
-    </Box>
-  )
-}
+      </Paper>
+    </Container>
+  );
+};
 
 export default SignUp;

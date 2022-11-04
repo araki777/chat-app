@@ -14,7 +14,7 @@ import { useForm } from "@mantine/form";
 import Link from "next/link";
 import { useSession } from "@/context/session";
 import { SessionGuard } from "@/guards/SessionGuard";
-import { useStyles } from "@/styles/pages/login"
+import { useStyles } from "@/styles/pages/login";
 
 interface SignInFormInput {
   email: string;
@@ -23,8 +23,13 @@ interface SignInFormInput {
 
 const SignIn: NextPage = () => {
   const { classes } = useStyles();
-  const { onSignIn, onSignInWithTwitter, onSignInWithGoogle, onSignInWithGitHub, loading } =
-    useSession();
+  const {
+    onSignIn,
+    onSignInWithTwitter,
+    onSignInWithGoogle,
+    onSignInWithGitHub,
+    loading,
+  } = useSession();
   const form = useForm<SignInFormInput>({
     initialValues: {
       email: "",
@@ -92,6 +97,7 @@ const SignIn: NextPage = () => {
               <Avatar
                 onClick={onSignInWithTwitter}
                 className={classes.avatar}
+                size="lg"
               >
                 <svg
                   width="20px"
@@ -117,6 +123,7 @@ const SignIn: NextPage = () => {
               <Avatar
                 onClick={onSignInWithGitHub}
                 className={classes.avatar}
+                size="lg"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -130,6 +137,7 @@ const SignIn: NextPage = () => {
               <Avatar
                 onClick={onSignInWithGoogle}
                 className={classes.avatar}
+                size="lg"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

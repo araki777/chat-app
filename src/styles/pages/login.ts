@@ -1,7 +1,4 @@
-import {
-  createStyles
-} from "@mantine/core";
-
+import { createStyles } from "@mantine/core";
 
 export const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -28,7 +25,7 @@ export const useStyles = createStyles((theme) => ({
     fontFamily: "Griffy",
     textAlign: "center",
     marginTop: 20,
-    marginBottom: 50
+    marginBottom: 50,
   },
 
   logo: {
@@ -41,7 +38,7 @@ export const useStyles = createStyles((theme) => ({
 
   input: {
     [`.mantine-textInput-input:focus`]: {
-      border: "1px solid #7f7fff"
+      border: "1px solid #7f7fff",
     },
     [`.mantine-PasswordInput-input:focus-within`]: {
       border: "1px solid #7f7fff",
@@ -49,19 +46,21 @@ export const useStyles = createStyles((theme) => ({
   },
 
   button: {
-    background: "#ced4da",
+    color: "#212529",
+    background: "#EEEEEE",
     webkitTransition: "all 0.3s ease",
     mozTransition: "all 0.3s ease",
     oTransition: "all 0.3s ease",
     transition: "all  0.3s ease",
-    marginTop: 40
+    marginTop: 40,
   },
 
   divider: {
-    marginTop: 40
+    marginTop: 40,
   },
 
   avatar: {
+    backgroundColor: "#EEEEEE",
     borderRadius: 50,
     margin: "auto",
     textAlign: "center",
@@ -72,15 +71,18 @@ export const useStyles = createStyles((theme) => ({
     ":hover": {
       transform: "scale(1.3, 1.3)",
     },
+    [".mantine-Avatar-placeholder"]: {
+      backgroundColor: "transparent",
+    },
   },
 
   span: {
     marginTop: 20,
-    fontSize: 12
+    fontSize: 12,
   },
 
   link: {
     marginTop: 10,
-    fontSize: 12
-  }
+    fontSize: 12,
+  },
 }));
