@@ -1,13 +1,11 @@
 import { NextPage } from "next";
 import {
   Paper,
-  createStyles,
   TextInput,
   PasswordInput,
   Button,
   Title,
   Group,
-  Grid,
   BackgroundImage,
   Divider,
   Avatar,
@@ -16,55 +14,7 @@ import { useForm } from "@mantine/form";
 import Link from "next/link";
 import { useSession } from "@/context/session";
 import { SessionGuard } from "@/guards/SessionGuard";
-import { IconBrandGithub } from "@tabler/icons";
-
-const useStyles = createStyles((theme) => ({
-  wrapper: {
-    display: "flex",
-  },
-
-  form: {
-    borderRight: `1px solid ${
-      theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[3]
-    }`,
-    maxWidth: 450,
-    paddingTop: 80,
-
-    [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
-      maxWidth: "100%",
-    },
-  },
-
-  title: {
-    color: theme.colorScheme === "dark" ? theme.white : theme.black,
-    fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-  },
-
-  logo: {
-    color: theme.colorScheme === "dark" ? theme.white : theme.black,
-    width: 120,
-    display: "block",
-    marginLeft: "auto",
-    marginRight: "auto",
-  },
-
-  input: {
-    [`input[type="text"]:focus`]: {
-      border: "1px solid #7f7fff",
-    },
-    [`.mantine-PasswordInput-input:focus-within`]: {
-      border: "1px solid #7f7fff",
-    },
-  },
-
-  button: {
-    background: "#ced4da",
-    webkitTransition: "all 0.3s ease",
-    mozTransition: "all 0.3s ease",
-    oTransition: "all 0.3s ease",
-    transition: "all  0.3s ease",
-  },
-}));
+import { useStyles } from "@/styles/pages/login"
 
 interface SignInFormInput {
   email: string;
@@ -98,15 +48,8 @@ const SignIn: NextPage = () => {
   return (
     <SessionGuard>
       <div className={classes.wrapper}>
-        <Paper className={classes.form} radius={0} p={30}>
-          <Title
-            order={1}
-            className={classes.title}
-            align="center"
-            mt="md"
-            mb={50}
-            sx={{ fontFamily: "Griffy !important" }}
-          >
+        <Paper className={classes.form}>
+          <Title order={1} className={classes.title}>
             Talk Out
           </Title>
 
@@ -115,8 +58,8 @@ const SignIn: NextPage = () => {
               withAsterisk
               label="メールアドレス"
               placeholder="aaa@example.com"
-              size="xs"
               className={classes.input}
+              size="xs"
               {...form.getInputProps("email")}
             />
             <PasswordInput
@@ -133,31 +76,22 @@ const SignIn: NextPage = () => {
               fullWidth
               loading={loading}
               className={classes.button}
-              sx={{ marginTop: 40 }}
             >
               ログイン
             </Button>
+            <Link href="/sendEmail">
+              <a className={classes.link}>パスワードをお忘れですか？</a>
+            </Link>
             <Divider
               label="SNSアカウントでログイン"
               labelPosition="center"
               color="#ced4da"
-              sx={{ marginTop: 60 }}
+              className={classes.divider}
             />
             <Group mt="xl">
               <Avatar
                 onClick={onSignInWithTwitter}
-                sx={{
-                  borderRadius: 50,
-                  margin: "auto",
-                  textAlign: "center",
-                  webkitTransition: "all 0.3s ease",
-                  mozTransition: "all 0.3s ease",
-                  oTransition: "all 0.3s ease",
-                  transition: "all  0.3s ease",
-                  ":hover": {
-                    transform: "scale(1.3, 1.3)",
-                  },
-                }}
+                className={classes.avatar}
               >
                 <svg
                   width="20px"
@@ -182,18 +116,7 @@ const SignIn: NextPage = () => {
               </Avatar>
               <Avatar
                 onClick={onSignInWithGitHub}
-                sx={{
-                  borderRadius: 50,
-                  margin: "auto",
-                  textAlign: "center",
-                  webkitTransition: "all 0.3s ease",
-                  mozTransition: "all 0.3s ease",
-                  oTransition: "all 0.3s ease",
-                  transition: "all  0.3s ease",
-                  ":hover": {
-                    transform: "scale(1.3, 1.3)",
-                  },
-                }}
+                className={classes.avatar}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -206,18 +129,7 @@ const SignIn: NextPage = () => {
               </Avatar>
               <Avatar
                 onClick={onSignInWithGoogle}
-                sx={{
-                  borderRadius: 50,
-                  margin: "auto",
-                  textAlign: "center",
-                  webkitTransition: "all 0.3s ease",
-                  mozTransition: "all 0.3s ease",
-                  oTransition: "all 0.3s ease",
-                  transition: "all  0.3s ease",
-                  ":hover": {
-                    transform: "scale(1.3, 1.3)",
-                  },
-                }}
+                className={classes.avatar}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -245,9 +157,11 @@ const SignIn: NextPage = () => {
               </Avatar>
             </Group>
             <Group spacing="lg" mt="lg" position="right">
-              <span>
+              <span className={classes.span}>
                 アカウントをお持ちではありませんか？
-                <Link href="/signUp">会員登録</Link>
+                <Link href="/signUp">
+                  <a>今すぐ作成</a>
+                </Link>
               </span>
             </Group>
           </form>
