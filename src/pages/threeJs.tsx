@@ -3,12 +3,16 @@ import * as THREE from "three";
 import { useEffect, useRef } from "react";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { useStyles } from "@/styles/pages/threeJs";
+import gsap from "gsap";
+import GUI from "lil-gui";
 
 const ThreeJs: NextPage = () => {
   const canvasRef = useRef<any>(null);
   const { classes } = useStyles();
 
   useEffect(() => {
+    const gui = new GUI();
+
     // Sizes
     const sizes = {
       width: window.innerWidth,
@@ -26,42 +30,87 @@ const ThreeJs: NextPage = () => {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     });
 
-    window.addEventListener("dblclick", () => {
-      const fullscreenElement = document.fullscreenElement;
+    const loadingManager = new THREE.LoadingManager();
 
-      if (!fullscreenElement) {
-        if (canvasRef.current.requestFullscreen) {
-          canvasRef.current.requestFullscreen();
-        }
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-      }
-    });
+    // loadingManager.onStart = () => {
+    //   console.log("onStart");
+    // };
+
+    // loadingManager.onLoad = () => {
+    //   console.log("onLoad");
+    // };
+
+    // loadingManager.onProgress = () => {
+    //   console.log("onProgress");
+    // };
+
+    // loadingManager.onError = () => {
+    //   console.log("onError");
+    // };
+
+    const textureLoader = new THREE.TextureLoader(loadingManager);
+    const colorTexture = textureLoader.load("./textures/minecraft.png");
+    const alphaTexture = textureLoader.load("./textures/door/alpha.jpg");
+    const heightTexture = textureLoader.load("./textures/door/height.jpg");
+    const normalTexture = textureLoader.load("./textures/door/normal.jpg");
+    const ambientOcclusionTexture = textureLoader.load(
+      "./textures/door/ambientOcclusion.jpg"
+    );
+    const metalnessTexture = textureLoader.load(
+      "./textures/door/metalness.jpg"
+    );
+    const roughnessTexture = textureLoader.load(
+      "./textures/door/roughness.jpg"
+    );
+
+    // colorTexture.repeat.x = 2;
+    // colorTexture.repeat.y = 3;
+    // colorTexture.wrapS = THREE.MirroredRepeatWrapping;
+    // colorTexture.wrapT = THREE.MirroredRepeatWrapping;
+
+    // colorTexture.offset.x = 0.5;
+    // colorTexture.offset.y = 0.5;
+
+    // colorTexture.rotation = Math.PI / 4;
+    // colorTexture.center.x = 0.5;
+    // colorTexture.center.y = 0.5;
+
+    colorTexture.generateMipmaps = false;
+    colorTexture.minFilter = THREE.NearestFilter;
+    colorTexture.magFilter = THREE.NearestFilter;
 
     // Scene
     const scene = new THREE.Scene();
 
-    const geometry = new THREE.BufferGeometry();
-
-    const count = 5000;
-    const positionsArray = new Float32Array(count * 3 * 3);
-
-    for (let i = 0; i < count * 3 * 3; i++) {
-      positionsArray[i] = (Math.random() - 0.5) * 4;
-    }
-
-    const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
-    geometry.setAttribute("position", positionsAttribute);
-
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    console.log(geometry.attributes.uv);
     const material = new THREE.MeshBasicMaterial({
-      color: 0xff0000,
-      wireframe: true,
+      map: colorTexture,
     });
 
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
+
+    gui.add(mesh.position, "x").min(-3).max(3).step(0.01).name("elevation");
+
+    gui.add(mesh, "visible");
+
+    gui.add(material, "wireframe");
+
+    const parameters = {
+      spin: () => {
+        gsap.to(mesh.rotation, {
+          duration: 1,
+          y: mesh.rotation.y + Math.PI * 2,
+        });
+      },
+    };
+
+    const spin = () => {};
+
+    gui.addColor(material, "color");
+
+    gui.add(parameters, "spin");
 
     // Camera
     const camera = new THREE.PerspectiveCamera(
@@ -71,7 +120,7 @@ const ThreeJs: NextPage = () => {
       100
     );
 
-    camera.position.z = 3;
+    camera.position.z = 9;
     scene.add(camera);
 
     const controls = new OrbitControls(camera, canvasRef.current);
