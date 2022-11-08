@@ -1,9 +1,8 @@
 import type { NextPage } from "next";
 import * as THREE from "three";
 import { useEffect, useRef } from "react";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { useStyles } from "@/styles/pages/threeJs";
-import gsap from "gsap";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import GUI from "lil-gui";
 
 const ThreeJs: NextPage = () => {
@@ -30,87 +29,128 @@ const ThreeJs: NextPage = () => {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     });
 
-    const loadingManager = new THREE.LoadingManager();
+    const textureLoader = new THREE.TextureLoader();
+    const cubeTextureLoader = new THREE.CubeTextureLoader();
 
-    // loadingManager.onStart = () => {
-    //   console.log("onStart");
-    // };
-
-    // loadingManager.onLoad = () => {
-    //   console.log("onLoad");
-    // };
-
-    // loadingManager.onProgress = () => {
-    //   console.log("onProgress");
-    // };
-
-    // loadingManager.onError = () => {
-    //   console.log("onError");
-    // };
-
-    const textureLoader = new THREE.TextureLoader(loadingManager);
-    const colorTexture = textureLoader.load("./textures/minecraft.png");
-    const alphaTexture = textureLoader.load("./textures/door/alpha.jpg");
-    const heightTexture = textureLoader.load("./textures/door/height.jpg");
-    const normalTexture = textureLoader.load("./textures/door/normal.jpg");
-    const ambientOcclusionTexture = textureLoader.load(
-      "./textures/door/ambientOcclusion.jpg"
+    const doorColorTexture = textureLoader.load("/textures/door/color.jpg");
+    const doorAlphaTexture = textureLoader.load("/textures/door/alpha.jpg");
+    const doorAmbientOcclusionTexture = textureLoader.load(
+      "/textures/door/ambientOcclusion.jpg"
     );
-    const metalnessTexture = textureLoader.load(
-      "./textures/door/metalness.jpg"
+    const doorHeightTexture = textureLoader.load("/textures/door/height.jpg");
+    const doorNormalTexture = textureLoader.load("/textures/door/normal.jpg");
+    const doorMetalnessTexture = textureLoader.load(
+      "/textures/door/metalness.jpg"
     );
-    const roughnessTexture = textureLoader.load(
-      "./textures/door/roughness.jpg"
-    );
+    const RoughnessTexture = textureLoader.load("/textures/door/roughness.jpg");
+    const matcapTexture = textureLoader.load("/textures/matcaps/8.png");
+    const gradientsTexture = textureLoader.load("/textures/gradients/5.jpg");
+    gradientsTexture.minFilter = THREE.NearestFilter;
+    gradientsTexture.magFilter = THREE.NearestFilter;
+    gradientsTexture.generateMipmaps = false;
 
-    // colorTexture.repeat.x = 2;
-    // colorTexture.repeat.y = 3;
-    // colorTexture.wrapS = THREE.MirroredRepeatWrapping;
-    // colorTexture.wrapT = THREE.MirroredRepeatWrapping;
-
-    // colorTexture.offset.x = 0.5;
-    // colorTexture.offset.y = 0.5;
-
-    // colorTexture.rotation = Math.PI / 4;
-    // colorTexture.center.x = 0.5;
-    // colorTexture.center.y = 0.5;
-
-    colorTexture.generateMipmaps = false;
-    colorTexture.minFilter = THREE.NearestFilter;
-    colorTexture.magFilter = THREE.NearestFilter;
+    const environmentMapTexture = cubeTextureLoader.load([
+      "/textures/environmentMaps/3/px.jpg",
+      "/textures/environmentMaps/3/nx.jpg",
+      "/textures/environmentMaps/3/py.jpg",
+      "/textures/environmentMaps/3/ny.jpg",
+      "/textures/environmentMaps/3/pz.jpg",
+      "/textures/environmentMaps/3/nz.jpg",
+    ]);
 
     // Scene
     const scene = new THREE.Scene();
 
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    console.log(geometry.attributes.uv);
-    const material = new THREE.MeshBasicMaterial({
-      map: colorTexture,
-    });
+    // const material = new THREE.MeshBasicMaterial();
+    // material.map = doorColorTexture;
+    // // material.color = new THREE.Color("#ff00ff");
+    // // material.wireframe = true;
+    // // material.opacity = 0.5;
+    // material.transparent = true;
+    // material.alphaMap = doorAlphaTexture;
+    // material.side = THREE.DoubleSide;
 
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
+    // const material = new THREE.MeshNormalMaterial();
+    // material.flatShading = true;
 
-    gui.add(mesh.position, "x").min(-3).max(3).step(0.01).name("elevation");
+    // const material = new THREE.MeshMatcapMaterial();
+    // material.matcap = matcapTexture;
 
-    gui.add(mesh, "visible");
+    // const material = new THREE.MeshDepthMaterial();
 
-    gui.add(material, "wireframe");
+    // const material = new THREE.MeshLambertMaterial();
 
-    const parameters = {
-      spin: () => {
-        gsap.to(mesh.rotation, {
-          duration: 1,
-          y: mesh.rotation.y + Math.PI * 2,
-        });
-      },
-    };
+    // const material = new THREE.MeshPhongMaterial();
+    // material.shininess = 100;
+    // material.specular = new THREE.Color(0xff0000);
 
-    const spin = () => {};
+    // const material = new THREE.MeshToonMaterial();
+    // material.gradientMap = gradientsTexture;
 
-    gui.addColor(material, "color");
+    const material = new THREE.MeshStandardMaterial();
+    material.metalness = 0.7;
+    material.roughness = 0.2;
+    material.envMap = environmentMapTexture;
+    // material.map = doorColorTexture;
+    // material.aoMap = doorAmbientOcclusionTexture;
+    // material.aoMapIntensity = 1;
+    // material.displacementMap = doorHeightTexture;
+    // material.displacementScale = 0.05;
+    // material.metalnessMap = doorMetalnessTexture;
+    // material.roughnessMap = doorMetalnessTexture;
+    // material.normalMap = doorNormalTexture;
+    // material.normalScale.set(0.5, 0.5);
+    // material.alphaMap = doorAlphaTexture;
+    // material.transparent = true;
 
-    gui.add(parameters, "spin");
+    gui.add(material, "metalness").min(0).max(1).step(0.0001);
+    gui.add(material, "roughness").min(0).max(1).step(0.0001);
+    gui.add(material, "aoMapIntensity").min(0).max(1).step(0.0001);
+    gui.add(material, "displacementScale").min(0).max(1).step(0.0001);
+
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(0.5, 64, 64),
+      material
+    );
+    sphere.position.x = -1.5;
+
+    sphere.geometry.setAttribute(
+      "uv2",
+      new THREE.BufferAttribute(sphere.geometry.attributes.uv.array, 2)
+    );
+
+    const plane = new THREE.Mesh(
+      new THREE.PlaneGeometry(1, 1, 100, 100),
+      material
+    );
+
+    plane.geometry.setAttribute(
+      "uv2",
+      new THREE.BufferAttribute(plane.geometry.attributes.uv.array, 2)
+    );
+
+    const torus = new THREE.Mesh(
+      new THREE.TorusGeometry(0.3, 0.2, 64, 128),
+      material
+    );
+
+    torus.position.x = 1.5;
+
+    torus.geometry.setAttribute(
+      "uv2",
+      new THREE.BufferAttribute(torus.geometry.attributes.uv.array, 2)
+    );
+
+    scene.add(sphere, plane, torus);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    const pointLight = new THREE.PointLight(0xffffff, 0.5);
+    pointLight.position.x = 2;
+    pointLight.position.y = 3;
+    pointLight.position.z = 4;
+    scene.add(pointLight);
 
     // Camera
     const camera = new THREE.PerspectiveCamera(
@@ -120,11 +160,10 @@ const ThreeJs: NextPage = () => {
       100
     );
 
-    camera.position.z = 9;
+    camera.position.z = 3;
     scene.add(camera);
 
     const controls = new OrbitControls(camera, canvasRef.current);
-    controls.enableDamping = true;
 
     // Renderer
     const renderer = new THREE.WebGLRenderer({
@@ -139,6 +178,16 @@ const ThreeJs: NextPage = () => {
     // Animations
     const tick = () => {
       const elapsedTime = clock.getElapsedTime();
+
+      // update objects
+      sphere.rotation.y = 0.1 * elapsedTime;
+      plane.rotation.y = 0.1 * elapsedTime;
+      torus.rotation.y = 0.1 * elapsedTime;
+
+      sphere.rotation.x = 0.1 * elapsedTime;
+      plane.rotation.x = 0.1 * elapsedTime;
+      torus.rotation.x = 0.1 * elapsedTime;
+
       controls.update();
       renderer.render(scene, camera);
       window.requestAnimationFrame(tick);
