@@ -6,5 +6,6 @@ export const useStyles = createStyles((theme) => ({
     top: 0,
     left: 0,
     outline: "none",
+    backgroundImage: "radial-gradient(#ffffff, #88888888)",
   },
 }));
